@@ -54,9 +54,12 @@ Task 7: complete (commits 3c4dc1d..b9f4bea, review clean)
 Task 8: complete (commits af6b118..dc02fc0, review clean)
 
 ## M2 里程碑：完成
+- 增量：下架命名 + 草稿删除（af27f07 删除接口/按钮，2aacabf 语义修正）
+
 - final review 发现公网边界漏洞，已修复（c156b90 权限/越权/XSS/回退，b6f449e 附件收口）
 - 后端 30 passed；前端静态编译通过，运行时待普通终端补验
 - 里程碑总结：docs/superpowers/progress/2026-08-22-m2-总结.md
+
 
 
 
