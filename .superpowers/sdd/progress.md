@@ -9,6 +9,7 @@ Task 4: complete (commits 732755b..52577c0, review clean)
 Task 5: complete (commits 52577c0..e0cf1af, review clean)
 Task 6: complete (commits d18fec8..2c70013, review clean)
 Task 7: complete (commits af1a574..563d710, review clean after fix)
+Task 8: complete (commits 987e534..6020211, review clean)
 
 
 
@@ -23,6 +24,8 @@ Task 7: complete (commits af1a574..563d710, review clean after fix)
 - users.py 创建用户查重非原子（TOCTOU），建议 catch IntegrityError（Task 5）
 - [环境] 沙箱禁止 esbuild spawn，前端 dev/build 需在普通终端补跑验收（Task 6）
 - Login.vue 无前端表单校验，依赖后端报错（Task 7，设计取舍）
+- Home.vue 死代码，待 M1 收尾清理（Task 8）
+
 
 
 
