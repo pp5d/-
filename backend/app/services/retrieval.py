@@ -5,7 +5,7 @@ from app.models.chunk import Chunk
 from app.models.knowledge import KnowledgeItem
 from app.services.embedding import embed_texts
 
-SIM_THRESHOLD = 0.35
+SIM_THRESHOLD = 0.5
 
 
 def _cosine(a: list[float], b: list[float]) -> float:
