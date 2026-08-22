@@ -1,0 +1,20 @@
+from pydantic_settings import BaseSettings
+
+
+class Settings(BaseSettings):
+    APP_MODE: str = "full"  # full=内网全功能 | public=公网只读问答
+    DATABASE_URL: str = "postgresql+psycopg://aiqa:aiqa_dev_password@localhost:5432/aiqa"
+    SECRET_KEY: str = "please-change-me"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7
+    DEEPSEEK_API_KEY: str = ""
+    PUBLIC_API_TOKEN: str = ""
+    UPLOAD_DIR: str = "./data/uploads"
+    MAX_IMAGE_MB: int = 10
+    MAX_VIDEO_MB: int = 100
+    MAX_PDF_MB: int = 50
+
+    class Config:
+        env_file = ".env"
+
+
+settings = Settings()
