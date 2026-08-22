@@ -118,3 +118,9 @@ Task 5: complete (commits 2aa5bf0..3d47af6, review clean)
 
 
 
+
+## 健康检查与修复（M4 后）
+- 前后端健康检查评级：良（B+）
+- 修复 6 项：后端 CORS/附件相对路径/魔数校验/全局异常（a0af81b）+ 前端工单死文案/UI 角色判断（7b4aa04）
+- 后端 46 passed 无回归；前端构建待普通终端补验
+
