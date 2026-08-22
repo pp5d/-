@@ -9,7 +9,8 @@ const routes = [
     children: [
       { path: '', component: () => import('../views/Dashboard.vue') },
       { path: 'chat', component: () => import('../views/Placeholder.vue') },
-      { path: 'knowledge', component: () => import('../views/Placeholder.vue') },
+      { path: 'knowledge', component: () => import('../views/knowledge/KnowledgeBrowse.vue') },
+      { path: 'knowledge/:id', component: () => import('../views/knowledge/KnowledgeDetail.vue') },
       { path: 'tickets', component: () => import('../views/Placeholder.vue') },
       { path: 'manage', component: () => import('../views/knowledge/KnowledgeList.vue'), meta: { roles: ['engineer', 'admin'] } },
       { path: 'manage/edit/:id?', component: () => import('../views/knowledge/KnowledgeEdit.vue'), meta: { roles: ['engineer', 'admin'] } },
