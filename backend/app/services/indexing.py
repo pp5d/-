@@ -1,4 +1,4 @@
-from sqlalchemy import delete, select
+from sqlalchemy import delete
 
 from app.models.chunk import Chunk
 from app.models.knowledge import KnowledgeItem
@@ -20,7 +20,7 @@ def chunk_text(text: str, max_len: int = 500) -> list[str]:
 
 def reindex_knowledge(item: KnowledgeItem, db) -> None:
     db.execute(delete(Chunk).where(Chunk.knowledge_id == item.id))
-    texts = chunk_text(item.body) + list(item.aliases or [])
+    texts = [t for t in (chunk_text(item.body) + list(item.aliases or [])) if t.strip()]
     if not texts:
         return
     vectors = embed_texts(texts)

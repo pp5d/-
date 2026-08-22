@@ -1,9 +1,8 @@
 from app.db import SessionLocal
 from app.models.chunk import Chunk
-from app.models.knowledge import KnowledgeItem
 from app.models.user import User
 from app.core.security import hash_password
-from app.services.indexing import chunk_text, reindex_knowledge
+from app.services.indexing import chunk_text
 
 
 def _seed():
@@ -31,4 +30,17 @@ def test_reindex_creates_chunks(client):
     chunks = db.query(Chunk).filter(Chunk.knowledge_id == kid).all()
     assert len(chunks) >= 2  # 正文 1 块 + 别名 1 块
     assert all(len(c.embedding) == 512 for c in chunks)
+    db.close()
+
+
+def test_reindex_empty_body_no_chunks(client):
+    _seed()
+    t = client.post("/api/auth/login", json={"username": "eng1", "password": "secret123"}).json()["access_token"]
+    h = {"Authorization": f"Bearer {t}"}
+    kid = client.post("/api/knowledge", json={"title": "空", "kind": "article", "body": ""}, headers=h).json()["id"]
+    client.post(f"/api/knowledge/{kid}/submit", headers=h)
+    r = client.post(f"/api/knowledge/{kid}/review", json={"approve": True}, headers=h)
+    assert r.status_code == 200
+    db = SessionLocal()
+    assert len(db.query(Chunk).filter(Chunk.knowledge_id == kid).all()) == 0
     db.close()
