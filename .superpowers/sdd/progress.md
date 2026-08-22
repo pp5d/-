@@ -82,6 +82,12 @@ Task 3: complete (commits 2867bb7..29fd359, review clean)
 Task 4: complete (commits ee2ce7a..5c3b7e4, review clean；f-string 引号修复)
 Task 5: complete (commits 726a744..8d02f07, review clean)
 
+## M3 里程碑：完成
+- final review 3 项必改已修复（ee2ff23：LLM 兜底/超时对齐/未命中文案/设计文档回写）
+- 后端 40 passed；DeepSeek key 待配置 + 前端运行时待补验
+- 里程碑总结：docs/superpowers/progress/2026-08-22-m3-总结.md
+
+
 
 
 
