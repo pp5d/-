@@ -45,6 +45,9 @@ Task 9: complete (commits 5da2b69..29782f9, review clean)
 ## M2 知识库
 
 Task 1: complete (commits c979a54..f7fbada, review clean)
+Task 2: complete (commits dd8994b..820f360, review clean；编辑权限=engineer/admin 或作者)
+
+
 
 
 
