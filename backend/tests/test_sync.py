@@ -26,6 +26,7 @@ def test_import_requires_token(client):
 
 def test_import_ok(client, monkeypatch):
     monkeypatch.setattr(settings, "PUBLIC_API_TOKEN", "test-token")
+    monkeypatch.setattr(settings, "APP_MODE", "public")
     r = client.post("/api/sync/import", json={"knowledge": []}, headers={"X-Sync-Token": "test-token"})
     assert r.status_code == 200
     assert r.json()["ok"] is True
@@ -40,6 +41,7 @@ def test_push_requires_admin(client):
 
 def test_import_nonempty_creates_sync_user(client, monkeypatch):
     monkeypatch.setattr(settings, "PUBLIC_API_TOKEN", "test-token")
+    monkeypatch.setattr(settings, "APP_MODE", "public")
     snapshot = {
         "knowledge": [
             {

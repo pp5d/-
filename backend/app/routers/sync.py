@@ -56,13 +56,28 @@ def _build_snapshot(db: Session) -> dict:
 def import_snapshot(body: dict, x_sync_token: str = Header(default=""), db: Session = Depends(get_db)):
     if not settings.PUBLIC_API_TOKEN or x_sync_token != settings.PUBLIC_API_TOKEN:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "同步令牌无效")
+    if settings.APP_MODE != "public":
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "仅公网实例接收同步")
+    if not isinstance(body, dict) or not isinstance(body.get("knowledge"), list):
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "快照格式错误")
+    if len(body.get("knowledge", [])) > 5000:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "快照过大")
     sys_user = db.scalar(select(User).where(User.username == "sync_bot"))
     if sys_user is None:
-        sys_user = User(username="sync_bot", role="admin", hashed_password=hash_password("sync-bot-internal"))
+        sys_user = User(username="sync_bot", role="support", is_active=False, hashed_password=hash_password("sync-bot-internal"))
         db.add(sys_user)
         db.flush()
     author_id = sys_user.id
-    # 清空公网 publish 知识（chunks/attachments 靠外键 CASCADE 级联删除）
+    # 先清理旧附件文件，再清空公网 publish 知识（chunks/attachments 靠外键 CASCADE 级联删除）
+    old_items = db.scalars(select(KnowledgeItem).where(KnowledgeItem.publish_to_public == True)).all()  # noqa: E712
+    for it in old_items:
+        for att in db.scalars(select(Attachment).where(Attachment.knowledge_id == it.id)).all():
+            p = Path(settings.UPLOAD_DIR) / att.storage_path
+            try:
+                if p.exists():
+                    p.unlink()
+            except OSError:
+                pass
     db.execute(delete(KnowledgeItem).where(KnowledgeItem.publish_to_public == True))  # noqa: E712
     import uuid
 

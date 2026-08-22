@@ -3,7 +3,7 @@ services:
     image: postgres:16
     environment:
       POSTGRES_USER: aiqa
-      POSTGRES_PASSWORD: aiqa_prod_password
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-aiqa_prod_password}
       POSTGRES_DB: aiqa
     volumes:
       - pgdata:/var/lib/postgresql/data
@@ -16,12 +16,12 @@ services:
   backend:
     build: ./backend
     environment:
-      APP_MODE: full
-      DATABASE_URL: postgresql+psycopg://aiqa:aiqa_prod_password@db:5432/aiqa
-      SECRET_KEY: change-me
+      APP_MODE: ${APP_MODE:-full}
+      DATABASE_URL: postgresql+psycopg://aiqa:${POSTGRES_PASSWORD:-aiqa_prod_password}@db:5432/aiqa
+      SECRET_KEY: ${SECRET_KEY}
       DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY}
       PUBLIC_API_TOKEN: ${PUBLIC_API_TOKEN}
-      CORS_ORIGINS: "*"
+      CORS_ORIGINS: ${CORS_ORIGINS:-*}
       UPLOAD_DIR: /data/uploads
     volumes:
       - backend_data:/data
