@@ -38,6 +38,8 @@ def answer_ticket(ticket_id: int, body: TicketAnswer, user: User = Depends(get_c
     t = db.get(Ticket, ticket_id)
     if t is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "工单不存在")
+    if t.status == "closed":
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "已关闭的工单不能答复")
     t.answer = body.answer
     t.assignee_id = user.id
     t.status = "answered"
@@ -54,6 +56,8 @@ def close_ticket(ticket_id: int, user: User = Depends(get_current_user), db: Ses
     t = db.get(Ticket, ticket_id)
     if t is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "工单不存在")
+    if t.status != "answered":
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "只有已答复的工单可关闭")
     t.status = "closed"
     db.commit()
     db.refresh(t)
@@ -67,6 +71,8 @@ def to_knowledge(ticket_id: int, user: User = Depends(get_current_user), db: Ses
     t = db.get(Ticket, ticket_id)
     if t is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "工单不存在")
+    if t.status != "answered":
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "只有已答复的工单可沉淀")
     if not t.answer:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "请先答复再沉淀")
     if t.knowledge_id:

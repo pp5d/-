@@ -49,3 +49,25 @@ def test_support_only_sees_own(client):
     r = client.get("/api/tickets", headers=_h(ts2))
     assert r.status_code == 200
     assert all(x["question"] != "q1" for x in r.json())
+
+
+def test_close_unanswered_forbidden(client):
+    _seed("sup1", "support")
+    _seed("eng1", "engineer")
+    ts = _token(client, "sup1")
+    te = _token(client, "eng1")
+    tid = client.post("/api/tickets", json={"question": "q"}, headers=_h(ts)).json()["id"]
+    r = client.post(f"/api/tickets/{tid}/close", headers=_h(te))
+    assert r.status_code == 400
+
+
+def test_answer_closed_forbidden(client):
+    _seed("sup1", "support")
+    _seed("eng1", "engineer")
+    ts = _token(client, "sup1")
+    te = _token(client, "eng1")
+    tid = client.post("/api/tickets", json={"question": "q"}, headers=_h(ts)).json()["id"]
+    client.post(f"/api/tickets/{tid}/answer", json={"answer": "a"}, headers=_h(te))
+    client.post(f"/api/tickets/{tid}/close", headers=_h(te))
+    r = client.post(f"/api/tickets/{tid}/answer", json={"answer": "again"}, headers=_h(te))
+    assert r.status_code == 400
