@@ -130,6 +130,8 @@ Task 5: complete (commits 2aa5bf0..3d47af6, review clean)
 Task 1: complete (commits 9f7df40..81f1984, review clean after fix；author_id 改 sync_bot)
 Task 2: complete (commits 91e8b6d..5d9a0d0, review clean)
 Task 3: complete (commits dcfacc1..75c9973, review clean)
+Task 4: complete (commits 06e5a60..38afb8f, review clean)
+
 
 
 
