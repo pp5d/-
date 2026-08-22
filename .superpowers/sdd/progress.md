@@ -78,6 +78,8 @@ Task 8: complete (commits af6b118..dc02fc0, review clean)
 
 Task 1: complete (commits 424a98f..05ebdae, review clean)
 Task 2: complete (commits 79f89cf..1d13132, review clean after fix；chunk_text 逐段分块)
+Task 3: complete (commits 2867bb7..29fd359, review clean)
+
 
 
 
