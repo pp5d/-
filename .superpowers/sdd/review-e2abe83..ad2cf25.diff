@@ -1,0 +1,10 @@
+﻿# Review package: e2abe83..ad2cf25
+
+## Commits
+ad2cf25 chore: 仓库结构与本机数据库连接配置
+
+## Files changed
+ .gitignore           | 10 ++++++++++  README.md            | 14 ++++++++++++++  backend/.env.example | 10 ++++++++++  3 files changed, 34 insertions(+)
+
+## Diff
+diff --git a/.gitignore b/.gitignore new file mode 100644 index 0000000..bc663e5 --- /dev/null +++ b/.gitignore @@ -0,0 +1,10 @@ +node_modules/ +dist/ +__pycache__/ +*.pyc +.venv/ +.env +data/ +.pytest_cache/ +*.log +.DS_Store diff --git a/README.md b/README.md new file mode 100644 index 0000000..d30abcc --- /dev/null +++ b/README.md @@ -0,0 +1,14 @@ +# 注塑机上位机智能问答系统（AIQA） + +面向注塑机上位机领域的知识库共建 + 智能问答系统。 + +- 设计文档：`docs/superpowers/specs/2026-08-22-注塑机上位机智能问答系统-design.md` +- 实施计划：`docs/superpowers/plans/` + +## 快速开始（开发环境：本机 PostgreSQL 16） + +0. 前置：本机 PostgreSQL 16 已安装（`D:\PostgreSQL\16`，服务 `postgresql-16`），角色 `aiqa`/库 `aiqa` 已创建 +1. `cd backend && python -m venv .venv && .venv\Scripts\activate && pip install -r requirements.txt` +2. 复制 `backend/.env.example` 为 `backend/.env` 并修改 SECRET_KEY +3. `cd backend && alembic upgrade head && uvicorn app.main:app --reload --port 8000` +4. `cd frontend && npm install && npm run dev`，浏览器打开 http://localhost:5173 diff --git a/backend/.env.example b/backend/.env.example new file mode 100644 index 0000000..a0bfa31 --- /dev/null +++ b/backend/.env.example @@ -0,0 +1,10 @@ +APP_MODE=full +DATABASE_URL=postgresql+psycopg://aiqa:aiqa_dev_password@localhost:5432/aiqa +SECRET_KEY=please-change-me +ACCESS_TOKEN_EXPIRE_MINUTES=10080 +DEEPSEEK_API_KEY= +PUBLIC_API_TOKEN=change-me +UPLOAD_DIR=./data/uploads +MAX_IMAGE_MB=10 +MAX_VIDEO_MB=100 +MAX_PDF_MB=50

@@ -1,0 +1,159 @@
+e0cf1af feat: 管理员用户管理接口
+ 
+## Files changed 
+ backend/app/main.py          |  3 ++-
+ backend/app/routers/users.py | 60 ++++++++++++++++++++++++++++++++++++++++++++
+ backend/tests/test_users.py  | 53 ++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 115 insertions(+), 1 deletion(-)
+ 
+## Diff 
+diff --git a/backend/app/main.py b/backend/app/main.py
+index b28109a..9eb0d2b 100644
+--- a/backend/app/main.py
++++ b/backend/app/main.py
+@@ -1,18 +1,19 @@
+ from fastapi import FastAPI
+ from fastapi.middleware.cors import CORSMiddleware
+ 
+ from app.config import settings
+-from app.routers import auth
++from app.routers import auth, users
+ 
+ app = FastAPI(title="AIQA - 注塑机上位机智能问答系统")
+ app.include_router(auth.router)
++app.include_router(users.router)
+ 
+ app.add_middleware(
+     CORSMiddleware,
+     allow_origins=["*"],
+     allow_credentials=True,
+     allow_methods=["*"],
+     allow_headers=["*"],
+ )
+ 
+ 
+diff --git a/backend/app/routers/users.py b/backend/app/routers/users.py
+new file mode 100644
+index 0000000..b0c3141
+--- /dev/null
++++ b/backend/app/routers/users.py
+@@ -0,0 +1,60 @@
++from fastapi import APIRouter, Depends, HTTPException, Query, status
++from sqlalchemy import select
++from sqlalchemy.orm import Session
++
++from app.config import settings
++from app.core.deps import require_roles
++from app.core.security import hash_password
++from app.db import get_db
++from app.models.user import ROLES, User
++from app.schemas.user import UserCreate, UserOut, UserUpdate
++
++router = APIRouter(
++    prefix="/api/users",
++    tags=["users"],
++    dependencies=[Depends(require_roles("admin"))],
++)
++
++
++@router.get("", response_model=list[UserOut])
++def list_users(db: Session = Depends(get_db)):
++    return db.scalars(select(User).order_by(User.id)).all()
++
++
++@router.post("", response_model=UserOut)
++def create_user(body: UserCreate, role: str = Query(default="support"), db: Session = Depends(get_db)):
++    if settings.APP_MODE != "full":
++        raise HTTPException(status.HTTP_403_FORBIDDEN, "公网实例禁止创建用户")
++    if role not in ROLES:
++        raise HTTPException(status.HTTP_400_BAD_REQUEST, f"角色必须是 {ROLES}")
++    exists = db.scalar(select(User).where(User.username == body.username))
++    if exists:
++        raise HTTPException(status.HTTP_400_BAD_REQUEST, "用户名已存在")
++    user = User(
++        username=body.username,
++        phone=body.phone,
++        role=role,
++        hashed_password=hash_password(body.password),
++    )
++    db.add(user)
++    db.commit()
++    db.refresh(user)
++    return user
++
++
++@router.patch("/{user_id}", response_model=UserOut)
++def update_user(user_id: int, body: UserUpdate, db: Session = Depends(get_db)):
++    user = db.get(User, user_id)
++    if user is None:
++        raise HTTPException(status.HTTP_404_NOT_FOUND, "用户不存在")
++    if body.role is not None:
++        if body.role not in ROLES:
++            raise HTTPException(status.HTTP_400_BAD_REQUEST, f"角色必须是 {ROLES}")
++        user.role = body.role
++    if body.group_name is not None:
++        user.group_name = body.group_name
++    if body.is_active is not None:
++        user.is_active = body.is_active
++    db.commit()
++    db.refresh(user)
++    return user
+diff --git a/backend/tests/test_users.py b/backend/tests/test_users.py
+new file mode 100644
+index 0000000..81bb370
+--- /dev/null
++++ b/backend/tests/test_users.py
+@@ -0,0 +1,53 @@
++def _login_as(client, username, password):
++    return client.post("/api/auth/login", json={"username": username, "password": password}).json()["access_token"]
++
++
++def _seed_user(client, username, role, password="secret123"):
++    from app.db import SessionLocal
++    from app.models.user import User
++    from app.core.security import hash_password
++
++    db = SessionLocal()
++    db.add(User(username=username, role=role, hashed_password=hash_password(password)))
++    db.commit()
++    db.close()
++
++
++def _admin_token(client):
++    _seed_user(client, "boss", "admin")
++    return _login_as(client, "boss", "secret123")
++
++
++def test_admin_list_users(client):
++    _seed_user(client, "eng1", "engineer")
++    token = _admin_token(client)
++    r = client.get("/api/users", headers={"Authorization": f"Bearer {token}"})
++    assert r.status_code == 200
++    usernames = [u["username"] for u in r.json()]
++    assert "eng1" in usernames and "boss" in usernames
++
++
++def test_non_admin_forbidden(client):
++    _seed_user(client, "eng1", "engineer")
++    token = _login_as(client, "eng1", "secret123")
++    r = client.get("/api/users", headers={"Authorization": f"Bearer {token}"})
++    assert r.status_code == 403
++
++
++def test_admin_create_user(client):
++    token = _admin_token(client)
++    r = client.post("/api/users?role=engineer", json={"username": "eng2", "password": "secret123"}, headers={"Authorization": f"Bearer {token}"})
++    assert r.status_code == 200
++    assert r.json()["role"] == "engineer"
++
++
++def test_admin_disable_user(client):
++    _seed_user(client, "eng1", "engineer")
++    token = _admin_token(client)
++    uid = client.get("/api/users", headers={"Authorization": f"Bearer {token}"}).json()[0]["id"]
++    r = client.patch(f"/api/users/{uid}", json={"is_active": False}, headers={"Authorization": f"Bearer {token}"})
++    assert r.status_code == 200
++    assert r.json()["is_active"] is False
++    # 被禁用的用户无法登录
++    r2 = client.post("/api/auth/login", json={"username": "eng1", "password": "secret123"})
++    assert r2.status_code == 403
