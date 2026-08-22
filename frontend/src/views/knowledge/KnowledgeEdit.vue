@@ -51,7 +51,7 @@ import { ElMessage } from 'element-plus'
 import MarkdownIt from 'markdown-it'
 import http from '../../api/http'
 
-const md = new MarkdownIt()
+const md = new MarkdownIt({ validateLink: (url) => /^(https?:|mailto:|#|\/)/i.test(url) })
 const route = useRoute()
 const router = useRouter()
 const aliasInput = ref('')

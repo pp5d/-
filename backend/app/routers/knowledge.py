@@ -13,6 +13,8 @@ router = APIRouter(prefix="/api/knowledge", tags=["knowledge"])
 
 
 def _can_edit(user: User, item: KnowledgeItem) -> bool:
+    if settings.APP_MODE == "public":
+        return user.role in ("engineer", "admin")  # 公网模式下 support 一律无编辑权
     return user.role in ("engineer", "admin") or item.author_id == user.id
 
 
@@ -47,8 +49,11 @@ def get_knowledge(item_id: int, user: User = Depends(get_current_user), db: Sess
     item = db.get(KnowledgeItem, item_id)
     if item is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "知识不存在")
-    if user.role == "support" and item.status != "published":
-        raise HTTPException(status.HTTP_403_FORBIDDEN, "该知识未发布")
+    if user.role == "support":
+        if item.status != "published":
+            raise HTTPException(status.HTTP_403_FORBIDDEN, "该知识未发布")
+        if settings.APP_MODE == "public" and not item.publish_to_public:
+            raise HTTPException(status.HTTP_403_FORBIDDEN, "该知识未对公网开放")
     return item
 
 
@@ -86,6 +91,8 @@ def update_knowledge(item_id: int, body: KnowledgeUpdate, user: User = Depends(g
     for k, v in data.items():
         setattr(item, k, v)
     item.version += 1
+    if item.status in ("published", "archived"):
+        item.status = "draft"
     db.commit()
     db.refresh(item)
     return item

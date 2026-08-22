@@ -14,7 +14,7 @@ import { useRoute } from 'vue-router'
 import MarkdownIt from 'markdown-it'
 import http from '../../api/http'
 
-const md = new MarkdownIt()
+const md = new MarkdownIt({ validateLink: (url) => /^(https?:|mailto:|#|\/)/i.test(url) })
 const route = useRoute()
 const item = ref(null)
 const loading = ref(false)
