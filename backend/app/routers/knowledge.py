@@ -1,3 +1,5 @@
+import os
+
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -5,7 +7,7 @@ from sqlalchemy.orm import Session
 from app.config import settings
 from app.core.deps import get_current_user
 from app.db import get_db
-from app.models.knowledge import KINDS, KnowledgeItem
+from app.models.knowledge import KINDS, Attachment, KnowledgeItem
 from app.models.user import User
 from app.schemas.knowledge import KnowledgeCreate, KnowledgeOut, KnowledgeUpdate, ReviewIn
 
@@ -156,3 +158,23 @@ def toggle_publish(item_id: int, user: User = Depends(get_current_user), db: Ses
     db.commit()
     db.refresh(item)
     return item
+
+
+@router.delete("/{item_id}")
+def delete_knowledge(item_id: int, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    item = db.get(KnowledgeItem, item_id)
+    if item is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "知识不存在")
+    if not _can_edit(user, item):
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "无权删除")
+    if item.status != "draft":
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "只有草稿可删除")
+    for att in db.scalars(select(Attachment).where(Attachment.knowledge_id == item_id)).all():
+        try:
+            if os.path.exists(att.storage_path):
+                os.remove(att.storage_path)
+        except OSError:
+            pass
+    db.delete(item)
+    db.commit()
+    return {"ok": True}

@@ -24,7 +24,8 @@
           <el-button size="small" @click="$router.push(`/manage/edit/${row.id}`)">编辑</el-button>
           <el-button v-if="row.status==='draft'" size="small" type="primary" @click="submit(row)">提交审核</el-button>
           <el-button v-if="row.status==='published'" size="small" @click="togglePub(row)">{{ row.publish_to_public ? '取消公网' : '发布公网' }}</el-button>
-          <el-button v-if="row.status!=='archived'" size="small" type="danger" @click="archive(row)">归档</el-button>
+          <el-button v-if="row.status==='draft'" size="small" type="danger" @click="del(row)">删除</el-button>
+          <el-button v-if="row.status!=='archived' && row.status!=='draft'" size="small" type="warning" @click="archive(row)">下架</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -33,7 +34,7 @@
 
 <script setup>
 import { onMounted, ref } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import http from '../../api/http'
 
 const items = ref([])
@@ -64,8 +65,15 @@ async function togglePub(row) {
   load()
 }
 async function archive(row) {
+  await ElMessageBox.confirm(`确定下架「${row.title}」吗？下架后售后和公网将看不到此知识。`, '下架确认', { type: 'warning' })
   await http.post(`/knowledge/${row.id}/archive`)
-  ElMessage.success('已归档')
+  ElMessage.success('已下架')
+  load()
+}
+async function del(row) {
+  await ElMessageBox.confirm(`确定删除草稿「${row.title}」吗？删除后不可恢复。`, '删除确认', { type: 'warning' })
+  await http.delete(`/knowledge/${row.id}`)
+  ElMessage.success('已删除')
   load()
 }
 
