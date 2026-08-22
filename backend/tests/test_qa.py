@@ -36,3 +36,16 @@ def test_qa_miss(client):
     r = client.post("/api/qa", json={"question": "一个完全无关的问题xyz"}, headers=h)
     assert r.status_code == 200
     assert r.json()["hit"] is False
+
+
+def test_qa_free_answer(client, monkeypatch):
+    _seed()
+    t = client.post("/api/auth/login", json={"username": "eng1", "password": "secret123"}).json()["access_token"]
+    h = {"Authorization": f"Bearer {t}"}
+    def fake_free(q):
+        return "这是通用知识回答。\n⚠️ 未经验证，仅供参考。"
+    monkeypatch.setattr("app.routers.qa.generate_free", fake_free)
+    r = client.post("/api/qa", json={"question": "注塑机基本单元有哪些", "allow_free": True}, headers=h)
+    assert r.status_code == 200
+    assert r.json()["hit"] is False
+    assert "仅供参考" in r.json()["answer"]
