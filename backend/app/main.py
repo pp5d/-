@@ -2,8 +2,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
+from app.routers import auth
 
 app = FastAPI(title="AIQA - 注塑机上位机智能问答系统")
+app.include_router(auth.router)
 
 app.add_middleware(
     CORSMiddleware,
