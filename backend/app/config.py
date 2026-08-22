@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     MAX_IMAGE_MB: int = 10
     MAX_VIDEO_MB: int = 100
     MAX_PDF_MB: int = 50
+    QA_RATE_LIMIT: int = 10  # 每用户每分钟提问次数上限
 
     @field_validator("SECRET_KEY")
     @classmethod

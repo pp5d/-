@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.core.deps import get_current_user
 from app.db import get_db
+from app.services.rate_limit import rate_limit_qa
 from app.models.ticket import Ticket
 from app.models.user import User
 from app.schemas.qa import QaIn, QaOut, QaSource
@@ -13,7 +14,7 @@ router = APIRouter(prefix="/api/qa", tags=["qa"])
 
 
 @router.post("", response_model=QaOut)
-def ask(body: QaIn, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+def ask(body: QaIn, user: User = Depends(rate_limit_qa), db: Session = Depends(get_db)):
     try:
         results = search(body.question, db)
     except Exception:
