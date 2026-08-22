@@ -77,6 +77,8 @@ Task 8: complete (commits af6b118..dc02fc0, review clean)
 ## M3 问答引擎
 
 Task 1: complete (commits 424a98f..05ebdae, review clean)
+Task 2: complete (commits 79f89cf..1d13132, review clean after fix；chunk_text 逐段分块)
+
 
 
 
