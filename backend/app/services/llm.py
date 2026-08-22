@@ -15,18 +15,24 @@ def build_prompt(question: str, contexts: list[str]) -> str:
 
 def generate(question: str, contexts: list[str]) -> str:
     prompt = build_prompt(question, contexts)
-    r = httpx.post(
-        "https://api.deepseek.com/chat/completions",
-        headers={"Authorization": f"Bearer {settings.DEEPSEEK_API_KEY}"},
-        json={
-            "model": "deepseek-chat",
-            "messages": [
-                {"role": "system", "content": "你是注塑机上位机技术助手，只基于提供的知识片段回答，不编造。"},
-                {"role": "user", "content": prompt},
-            ],
-            "temperature": 0.3,
-        },
-        timeout=60,
-    )
-    r.raise_for_status()
-    return r.json()["choices"][0]["message"]["content"]
+    try:
+        r = httpx.post(
+            "https://api.deepseek.com/chat/completions",
+            headers={"Authorization": f"Bearer {settings.DEEPSEEK_API_KEY}"},
+            json={
+                "model": "deepseek-chat",
+                "messages": [
+                    {"role": "system", "content": "你是注塑机上位机技术助手，只基于提供的知识片段回答，不编造。"},
+                    {"role": "user", "content": prompt},
+                ],
+                "temperature": 0.3,
+            },
+            timeout=60,
+        )
+        r.raise_for_status()
+        data = r.json()
+        if data.get("choices"):
+            return data["choices"][0]["message"]["content"]
+        raise ValueError("empty choices")
+    except Exception:
+        return "（智能生成服务暂不可用，以下为知识库检索到的相关内容）\n\n" + "\n\n".join(f"• {c}" for c in contexts)
