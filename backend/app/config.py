@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     DEEPSEEK_API_KEY: str = ""
     CORS_ORIGINS: str = "*"  # 逗号分隔，生产环境填具体域名
     PUBLIC_API_TOKEN: str = ""
+    PUBLIC_SYNC_URL: str = ""
     UPLOAD_DIR: str = "./data/uploads"
     MAX_IMAGE_MB: int = 10
     MAX_VIDEO_MB: int = 100
