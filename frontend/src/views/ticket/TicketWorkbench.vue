@@ -50,7 +50,11 @@ async function submitAnswer() {
 }
 
 async function close(row) {
-  await ElMessageBox.confirm('确定关闭该工单？', '提示', { type: 'warning' }).catch(() => {})
+  try {
+    await ElMessageBox.confirm('确定关闭该工单？', '提示', { type: 'warning' })
+  } catch {
+    return
+  }
   await http.post(`/tickets/${row.id}/close`)
   ElMessage.success('已关闭')
   load()

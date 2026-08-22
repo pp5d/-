@@ -65,13 +65,21 @@ async function togglePub(row) {
   load()
 }
 async function archive(row) {
-  await ElMessageBox.confirm(`确定下架「${row.title}」吗？下架后售后和公网将看不到此知识。`, '下架确认', { type: 'warning' }).catch(() => {})
+  try {
+    await ElMessageBox.confirm(`确定下架「${row.title}」吗？下架后售后和公网将看不到此知识。`, '下架确认', { type: 'warning' })
+  } catch {
+    return
+  }
   await http.post(`/knowledge/${row.id}/archive`)
   ElMessage.success('已下架')
   load()
 }
 async function del(row) {
-  await ElMessageBox.confirm(`确定删除草稿「${row.title}」吗？删除后不可恢复。`, '删除确认', { type: 'warning' }).catch(() => {})
+  try {
+    await ElMessageBox.confirm(`确定删除草稿「${row.title}」吗？删除后不可恢复。`, '删除确认', { type: 'warning' })
+  } catch {
+    return
+  }
   await http.delete(`/knowledge/${row.id}`)
   ElMessage.success('已删除')
   load()
