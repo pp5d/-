@@ -84,7 +84,8 @@ async function save() {
   } else {
     await http.post(`/users?role=${form.value.role}`, {
       username: form.value.username,
-      password: form.value.password
+      password: form.value.password,
+      group_name: form.value.group_name
     })
   }
   ElMessage.success('已保存')

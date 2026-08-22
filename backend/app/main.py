@@ -6,7 +6,8 @@ from app.routers import auth, users
 
 app = FastAPI(title="AIQA - 注塑机上位机智能问答系统")
 app.include_router(auth.router)
-app.include_router(users.router)
+if settings.APP_MODE == "full":
+    app.include_router(users.router)
 
 app.add_middleware(
     CORSMiddleware,

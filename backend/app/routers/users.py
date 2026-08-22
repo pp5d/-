@@ -33,6 +33,7 @@ def create_user(body: UserCreate, role: str = Query(default="support"), db: Sess
     user = User(
         username=body.username,
         phone=body.phone,
+        group_name=body.group_name,
         role=role,
         hashed_password=hash_password(body.password),
     )

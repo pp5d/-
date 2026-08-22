@@ -1,3 +1,4 @@
+from pydantic import field_validator
 from pydantic_settings import BaseSettings
 
 
@@ -12,6 +13,13 @@ class Settings(BaseSettings):
     MAX_IMAGE_MB: int = 10
     MAX_VIDEO_MB: int = 100
     MAX_PDF_MB: int = 50
+
+    @field_validator("SECRET_KEY")
+    @classmethod
+    def check_secret_key(cls, v: str) -> str:
+        if v in ("please-change-me", "change-me", ""):
+            raise ValueError("SECRET_KEY 不能使用默认值，请在 backend/.env 中设置强随机值")
+        return v
 
     class Config:
         env_file = ".env"

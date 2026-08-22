@@ -22,6 +22,7 @@ def register(body: UserCreate, db: Session = Depends(get_db)):
     user = User(
         username=body.username,
         phone=body.phone,
+        group_name=body.group_name,
         role="support",
         hashed_password=hash_password(body.password),
     )
