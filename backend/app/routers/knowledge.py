@@ -7,7 +7,7 @@ from app.core.deps import get_current_user
 from app.db import get_db
 from app.models.knowledge import KINDS, KnowledgeItem
 from app.models.user import User
-from app.schemas.knowledge import KnowledgeCreate, KnowledgeOut, KnowledgeUpdate
+from app.schemas.knowledge import KnowledgeCreate, KnowledgeOut, KnowledgeUpdate, ReviewIn
 
 router = APIRouter(prefix="/api/knowledge", tags=["knowledge"])
 
@@ -86,6 +86,66 @@ def update_knowledge(item_id: int, body: KnowledgeUpdate, user: User = Depends(g
     for k, v in data.items():
         setattr(item, k, v)
     item.version += 1
+    db.commit()
+    db.refresh(item)
+    return item
+
+
+@router.post("/{item_id}/submit", response_model=KnowledgeOut)
+def submit_knowledge(item_id: int, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    item = db.get(KnowledgeItem, item_id)
+    if item is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "知识不存在")
+    if item.author_id != user.id:
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "只有作者可提交审核")
+    if item.status != "draft":
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "只有草稿可提交审核")
+    item.status = "pending"
+    db.commit()
+    db.refresh(item)
+    return item
+
+
+@router.post("/{item_id}/review", response_model=KnowledgeOut)
+def review_knowledge(item_id: int, body: ReviewIn, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    item = db.get(KnowledgeItem, item_id)
+    if item is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "知识不存在")
+    if user.role not in ("engineer", "admin"):
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "无权审核")
+    if item.status != "pending":
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "只有待审核状态可审核")
+    item.status = "published" if body.approve else "draft"
+    item.reviewer_id = user.id
+    item.review_comment = body.comment
+    db.commit()
+    db.refresh(item)
+    return item
+
+
+@router.post("/{item_id}/archive", response_model=KnowledgeOut)
+def archive_knowledge(item_id: int, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    item = db.get(KnowledgeItem, item_id)
+    if item is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "知识不存在")
+    if user.role not in ("engineer", "admin"):
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "无权归档")
+    item.status = "archived"
+    db.commit()
+    db.refresh(item)
+    return item
+
+
+@router.post("/{item_id}/publish-toggle", response_model=KnowledgeOut)
+def toggle_publish(item_id: int, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    item = db.get(KnowledgeItem, item_id)
+    if item is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "知识不存在")
+    if user.role not in ("engineer", "admin"):
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "无权操作")
+    if item.status != "published":
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "只有已发布知识可切换公网发布")
+    item.publish_to_public = not item.publish_to_public
     db.commit()
     db.refresh(item)
     return item

@@ -46,3 +46,8 @@ class KnowledgeOut(BaseModel):
     updated_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+class ReviewIn(BaseModel):
+    approve: bool
+    comment: str = ""
