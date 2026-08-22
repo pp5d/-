@@ -76,6 +76,7 @@ async function freeAnswer(i) {
   try {
     const r = await http.post('/qa', { question: q, allow_free: true })
     messages.value.push({ role: 'assistant', text: r.answer, hit: false, sources: [] })
+    m.question = ''
   } catch (e) {
     messages.value.push({ role: 'assistant', text: '请求失败，请稍后重试。' })
   } finally {

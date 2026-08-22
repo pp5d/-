@@ -36,6 +36,7 @@ def test_qa_miss(client):
     r = client.post("/api/qa", json={"question": "一个完全无关的问题xyz"}, headers=h)
     assert r.status_code == 200
     assert r.json()["hit"] is False
+    assert "问题已记录" not in r.json()["answer"]
 
 
 def test_qa_free_answer(client, monkeypatch):

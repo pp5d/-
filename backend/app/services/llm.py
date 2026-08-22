@@ -56,7 +56,10 @@ def generate_free(question: str) -> str:
         r.raise_for_status()
         data = r.json()
         if data.get("choices"):
-            return data["choices"][0]["message"]["content"]
+            answer = data["choices"][0]["message"]["content"]
+            if "仅供参考" not in answer:
+                answer += "\n\n⚠️ 以上为通用知识，未经过内部知识库验证，仅供参考；现场操作请以工程师指导为准。"
+            return answer
         raise ValueError("empty choices")
     except Exception:
         return "（AI 生成服务暂不可用，请稍后重试，或联系工程师处理。）"
