@@ -4,7 +4,7 @@
       <div class="logo">注塑机智能问答</div>
       <el-menu :default-active="$route.path" router background-color="#001529" text-color="#a6adb4" active-text-color="#ffffff">
         <el-menu-item index="/"><el-icon><HomeFilled /></el-icon><span>首页</span></el-menu-item>
-        <template v-if="app.isPublic">
+        <template v-if="!auth.isEngineer">
           <el-menu-item index="/chat"><el-icon><ChatDotRound /></el-icon><span>智能问答</span></el-menu-item>
           <el-menu-item index="/knowledge"><el-icon><Reading /></el-icon><span>知识库</span></el-menu-item>
           <el-menu-item index="/tickets"><el-icon><Tickets /></el-icon><span>我的工单</span></el-menu-item>
@@ -21,7 +21,7 @@
     </el-aside>
     <el-container>
       <el-header class="header">
-        <span>{{ app.isPublic ? '公网门户（售后/试机）' : '内网系统（工程师）' }}</span>
+        <span>{{ auth.isEngineer ? '内网系统（工程师）' : '公网门户（售后/试机）' }}</span>
         <el-dropdown @command="onCommand">
           <span class="user">{{ auth.user?.username }}（{{ auth.user?.role }}）<el-icon><ArrowDown /></el-icon></span>
           <template #dropdown>

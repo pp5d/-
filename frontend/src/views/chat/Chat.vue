@@ -28,6 +28,7 @@
 import { nextTick, onMounted, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import http from '../../api/http'
+import { useRouter } from 'vue-router'
 
 const STORAGE_KEY = 'aiqa_chat_history'
 const MAX_MESSAGES = 30
@@ -37,6 +38,7 @@ const messages = ref([{ ...DEFAULT_WELCOME }])
 const question = ref('')
 const loading = ref(false)
 const msgBox = ref(null)
+const router = useRouter()
 
 function persist() {
   try {
@@ -87,7 +89,8 @@ async function freeAnswer(i) {
 }
 
 function toEngineer() {
-  ElMessage.info('工单功能将在后续版本上线，请先联系工程师处理。')
+  ElMessage.success('已为您创建工单，工程师会尽快处理，可在"我的工单"查看进度')
+  router.push('/tickets')
 }
 
 function clear() {
