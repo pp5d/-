@@ -13,7 +13,7 @@ router = APIRouter(prefix="/api/knowledge", tags=["knowledge"])
 
 
 def _can_edit(user: User, item: KnowledgeItem) -> bool:
-    return user.role == "admin" or item.author_id == user.id
+    return user.role in ("engineer", "admin") or item.author_id == user.id
 
 
 @router.get("", response_model=list[KnowledgeOut])
