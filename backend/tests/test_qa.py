@@ -29,14 +29,20 @@ def test_qa_hit(client, monkeypatch):
     assert data["sources"][0]["title"] == "模保原理"
 
 
-def test_qa_miss(client):
+def test_qa_miss_creates_ticket(client):
     _seed()
     t = client.post("/api/auth/login", json={"username": "eng1", "password": "secret123"}).json()["access_token"]
     h = {"Authorization": f"Bearer {t}"}
     r = client.post("/api/qa", json={"question": "一个完全无关的问题xyz"}, headers=h)
     assert r.status_code == 200
     assert r.json()["hit"] is False
-    assert "问题已记录" not in r.json()["answer"]
+    assert "已为您转交工程师" in r.json()["answer"]
+    # 工单已创建
+    from app.db import SessionLocal
+    from app.models.ticket import Ticket
+    db = SessionLocal()
+    assert db.query(Ticket).filter(Ticket.question == "一个完全无关的问题xyz").count() == 1
+    db.close()
 
 
 def test_qa_free_answer(client, monkeypatch):
