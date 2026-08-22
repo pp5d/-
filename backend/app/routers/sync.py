@@ -1,14 +1,14 @@
 import base64
-import os
 from pathlib import Path
 
 import httpx
-from fastapi import APIRouter, Depends, Header, HTTPException, Request, status
+from fastapi import APIRouter, Depends, Header, HTTPException, status
 from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 
 from app.config import settings
-from app.core.deps import get_current_user, require_roles
+from app.core.deps import require_roles
+from app.core.security import hash_password
 from app.db import get_db
 from app.models.chunk import Chunk
 from app.models.knowledge import Attachment, KnowledgeItem
@@ -56,6 +56,12 @@ def _build_snapshot(db: Session) -> dict:
 def import_snapshot(body: dict, x_sync_token: str = Header(default=""), db: Session = Depends(get_db)):
     if not settings.PUBLIC_API_TOKEN or x_sync_token != settings.PUBLIC_API_TOKEN:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "同步令牌无效")
+    sys_user = db.scalar(select(User).where(User.username == "sync_bot"))
+    if sys_user is None:
+        sys_user = User(username="sync_bot", role="admin", hashed_password=hash_password("sync-bot-internal"))
+        db.add(sys_user)
+        db.flush()
+    author_id = sys_user.id
     # 清空公网 publish 知识（chunks/attachments 靠外键 CASCADE 级联删除）
     db.execute(delete(KnowledgeItem).where(KnowledgeItem.publish_to_public == True))  # noqa: E712
     import uuid
@@ -72,7 +78,7 @@ def import_snapshot(body: dict, x_sync_token: str = Header(default=""), db: Sess
             machines=k.get("machines") or "",
             status="published",
             publish_to_public=True,
-            author_id=1,
+            author_id=author_id,
         )
         db.add(item)
         db.flush()
