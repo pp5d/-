@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     SECRET_KEY: str = "please-change-me"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7
     DEEPSEEK_API_KEY: str = ""
+    CORS_ORIGINS: str = "*"  # 逗号分隔，生产环境填具体域名
     PUBLIC_API_TOKEN: str = ""
     UPLOAD_DIR: str = "./data/uploads"
     MAX_IMAGE_MB: int = 10

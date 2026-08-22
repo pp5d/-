@@ -1,4 +1,3 @@
-import os
 import uuid
 from pathlib import Path
 
@@ -33,6 +32,20 @@ def _max_of(kind: str) -> int:
     return {"image": settings.MAX_IMAGE_MB, "video": settings.MAX_VIDEO_MB, "pdf": settings.MAX_PDF_MB}[kind]
 
 
+def _magic_kind(content: bytes) -> str:
+    if content.startswith(b"\xff\xd8\xff"):  # JPEG
+        return "image"
+    if content.startswith(b"\x89PNG\r\n\x1a\n"):  # PNG
+        return "image"
+    if content.startswith((b"GIF87a", b"GIF89a")):  # GIF
+        return "image"
+    if content.startswith(b"RIFF") and b"WEBP" in content[:16]:  # WEBP
+        return "image"
+    if content.startswith(b"%PDF"):  # PDF
+        return "pdf"
+    return ""
+
+
 @router.post("")
 def upload_file(
     knowledge_id: int = Query(...),
@@ -58,6 +71,9 @@ def upload_file(
         content += part
         if len(content) > limit:
             raise HTTPException(status.HTTP_400_BAD_REQUEST, f"文件超过 {_max_of(kind)}MB 限制")
+    magic = _magic_kind(content)
+    if kind in ("image", "pdf") and magic != kind:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "文件内容与扩展名不符")
     upload_dir = Path(settings.UPLOAD_DIR)
     upload_dir.mkdir(parents=True, exist_ok=True)
     storage_name = f"{uuid.uuid4().hex}.{file.filename.rsplit('.', 1)[-1].lower()}"
@@ -68,7 +84,7 @@ def upload_file(
         filename=file.filename or storage_name,
         content_type=kind,
         size=len(content),
-        storage_path=str(storage_path),
+        storage_path=storage_name,  # 只存文件名，相对 UPLOAD_DIR
     )
     db.add(att)
     db.commit()
@@ -89,7 +105,12 @@ def download_file(att_id: int, user: User = Depends(get_current_user), db: Sessi
             raise HTTPException(status.HTTP_403_FORBIDDEN, "无权下载")
         if settings.APP_MODE == "public" and not item.publish_to_public:
             raise HTTPException(status.HTTP_403_FORBIDDEN, "无权下载")
-    import os
-    if not os.path.exists(att.storage_path):
+    full_path = Path(settings.UPLOAD_DIR) / att.storage_path
+    if not full_path.exists():
         raise HTTPException(status.HTTP_404_NOT_FOUND, "文件已丢失")
-    return FileResponse(att.storage_path, filename=att.filename)
+    return FileResponse(
+        str(full_path),
+        filename=att.filename,
+        content_disposition_type="attachment",
+        headers={"X-Content-Type-Options": "nosniff"},
+    )

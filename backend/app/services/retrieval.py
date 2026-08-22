@@ -9,6 +9,8 @@ SIM_THRESHOLD = 0.5
 
 
 def _cosine(a: list[float], b: list[float]) -> float:
+    if not a or not b:
+        return 0.0
     return sum(x * y for x, y in zip(a, b))
 
 

@@ -14,7 +14,10 @@ router = APIRouter(prefix="/api/qa", tags=["qa"])
 
 @router.post("", response_model=QaOut)
 def ask(body: QaIn, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    results = search(body.question, db)
+    try:
+        results = search(body.question, db)
+    except Exception:
+        results = []
     if results and results[0][0] >= SIM_THRESHOLD:
         contexts = [c.content for _, c, _ in results]
         answer = generate(body.question, contexts)

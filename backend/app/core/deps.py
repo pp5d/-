@@ -17,9 +17,10 @@ def get_current_user(
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "未登录")
     try:
         payload = decode_token(credentials.credentials)
+        user_id = int(payload["sub"])
     except Exception:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "登录已失效")
-    user = db.get(User, int(payload["sub"]))
+    user = db.get(User, user_id)
     if user is None or not user.is_active:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "账号不可用")
     return user

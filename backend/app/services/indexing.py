@@ -23,6 +23,9 @@ def reindex_knowledge(item: KnowledgeItem, db) -> None:
     texts = [t for t in (chunk_text(item.body) + list(item.aliases or [])) if t.strip()]
     if not texts:
         return
-    vectors = embed_texts(texts)
+    try:
+        vectors = embed_texts(texts)
+    except Exception:
+        return
     for i, (t, v) in enumerate(zip(texts, vectors)):
         db.add(Chunk(knowledge_id=item.id, chunk_index=i, content=t, embedding=v))
