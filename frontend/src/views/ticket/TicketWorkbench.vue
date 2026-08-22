@@ -1,10 +1,12 @@
 <template>
   <el-card>
+    <div class="hint">{{ app.isPublic ? '我的工单：查看工程师对问题的答复' : '工单处理台：处理售后/试机人员提交的问题' }}</div>
     <el-table :data="items" border stripe v-loading="loading">
-      <el-table-column prop="id" label="ID" width="60" />
+      <el-table-column v-if="!app.isPublic" prop="id" label="ID" width="60" />
       <el-table-column prop="question" label="问题" min-width="220" show-overflow-tooltip />
       <el-table-column prop="status" label="状态" width="100" />
-      <el-table-column label="操作" width="260">
+      <el-table-column v-if="app.isPublic" prop="answer" label="工程师答复" min-width="200" show-overflow-tooltip />
+      <el-table-column v-if="!app.isPublic" label="操作" width="260">
         <template #default="{ row }">
           <el-button size="small" type="primary" @click="open(row)">答复</el-button>
           <el-button v-if="row.status==='answered'" size="small" @click="sink(row)">沉淀为知识</el-button>
@@ -28,7 +30,9 @@
 import { onMounted, ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import http from '../../api/http'
+import { useAppStore } from '../../stores/app'
 
+const app = useAppStore()
 const items = ref([])
 const loading = ref(false)
 const dialog = ref(false)
@@ -68,3 +72,15 @@ async function sink(row) {
 
 onMounted(load)
 </script>
+
+<style scoped>
+.hint {
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  background: #f4f4f5;
+  border-left: 3px solid #409eff;
+  color: #606266;
+  font-size: 13px;
+  border-radius: 3px;
+}
+</style>
