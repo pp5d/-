@@ -49,6 +49,8 @@ Task 2: complete (commits dd8994b..820f360, review clean；编辑权限=engineer
 Task 3: complete (commits 295c8c6..02677f0, review clean)
 Task 4: complete (commits 6540844..3af6dbd, review clean)
 Task 5: complete (commits 024af2d..ef3647a, review clean)
+Task 6: complete (commits 6f2e1cf..b3aefc6, review clean)
+
 
 
 
