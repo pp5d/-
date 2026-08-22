@@ -80,6 +80,8 @@ Task 1: complete (commits 424a98f..05ebdae, review clean)
 Task 2: complete (commits 79f89cf..1d13132, review clean after fix；chunk_text 逐段分块)
 Task 3: complete (commits 2867bb7..29fd359, review clean)
 Task 4: complete (commits ee2ce7a..5c3b7e4, review clean；f-string 引号修复)
+Task 5: complete (commits 726a744..8d02f07, review clean)
+
 
 
 
