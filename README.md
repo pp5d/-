@@ -12,3 +12,7 @@
 2. 复制 `backend/.env.example` 为 `backend/.env` 并修改 SECRET_KEY
 3. `cd backend && alembic upgrade head && uvicorn app.main:app --reload --port 8000`
 4. `cd frontend && npm install && npm run dev`，浏览器打开 http://localhost:5173
+
+## 部署
+
+见 `deploy/内网部署.md` 与 `deploy/公网部署.md`。双区架构：内网全功能 + 公网只读问答，知识通过发布同步（内网推送到公网）流转。
