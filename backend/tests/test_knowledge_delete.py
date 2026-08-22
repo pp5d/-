@@ -27,7 +27,7 @@ def test_delete_draft(client):
     assert client.get(f"/api/knowledge/{kid}", headers=_h(t)).status_code == 404
 
 
-def test_delete_published_forbidden(client):
+def test_delete_published_bad_request(client):
     _reg("eng1")
     t = _token(client, "eng1")
     kid = client.post("/api/knowledge", json={"title": "已发布", "kind": "qa", "body": "b"}, headers=_h(t)).json()["id"]
