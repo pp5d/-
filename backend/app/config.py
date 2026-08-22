@@ -21,8 +21,7 @@ class Settings(BaseSettings):
             raise ValueError("SECRET_KEY 不能使用默认值，请在 backend/.env 中设置强随机值")
         return v
 
-    class Config:
-        env_file = ".env"
+    model_config = {"env_file": ".env"}
 
 
 settings = Settings()
