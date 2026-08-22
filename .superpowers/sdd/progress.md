@@ -106,6 +106,12 @@ Task 3: complete (commits 01b385e..2f73a91, review clean)
 Task 4: complete (commits 096f8ee..67c1f7f, review clean after fix；确认框取消 bug)
 Task 5: complete (commits 2aa5bf0..3d47af6, review clean)
 
+## M4 里程碑：完成
+- final review 1 Critical+1 项已修复（3c1b70b：状态流转守卫 + question strip）
+- 后端 46 passed；前端运行时待补验
+- 里程碑总结：docs/superpowers/progress/2026-08-22-m4-总结.md
+
+
 
 
 
