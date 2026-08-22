@@ -16,7 +16,11 @@ http.interceptors.response.use(
     const detail = err.response?.data?.detail
     if (status === 401) {
       localStorage.removeItem('token')
-      if (!location.pathname.startsWith('/login')) location.href = '/login'
+      if (location.pathname.startsWith('/login')) {
+        ElMessage.error(typeof detail === 'string' ? detail : '用户名或密码错误')
+      } else {
+        location.href = '/login'
+      }
     } else {
       ElMessage.error(typeof detail === 'string' ? detail : '网络错误，请稍后重试')
     }
