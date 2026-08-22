@@ -8,7 +8,7 @@ const routes = [
     component: () => import('../layouts/MainLayout.vue'),
     children: [
       { path: '', component: () => import('../views/Dashboard.vue') },
-      { path: 'chat', component: () => import('../views/Placeholder.vue') },
+      { path: 'chat', component: () => import('../views/chat/Chat.vue') },
       { path: 'knowledge', component: () => import('../views/knowledge/KnowledgeBrowse.vue') },
       { path: 'knowledge/:id', component: () => import('../views/knowledge/KnowledgeDetail.vue') },
       { path: 'tickets', component: () => import('../views/Placeholder.vue') },
