@@ -10,6 +10,7 @@ from app.db import get_db
 from app.models.knowledge import KINDS, Attachment, KnowledgeItem
 from app.models.user import User
 from app.schemas.knowledge import KnowledgeCreate, KnowledgeOut, KnowledgeUpdate, ReviewIn
+from app.services.indexing import reindex_knowledge
 
 router = APIRouter(prefix="/api/knowledge", tags=["knowledge"])
 
@@ -127,6 +128,8 @@ def review_knowledge(item_id: int, body: ReviewIn, user: User = Depends(get_curr
     item.status = "published" if body.approve else "draft"
     item.reviewer_id = user.id
     item.review_comment = body.comment
+    if body.approve:
+        reindex_knowledge(item, db)
     db.commit()
     db.refresh(item)
     return item
