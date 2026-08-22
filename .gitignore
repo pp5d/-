@@ -9,3 +9,7 @@ data/
 *.log
 .DS_Store
 .tmp/
+
+# 子代理执行期过程文件（只保留进度台账）
+.superpowers/sdd/*
+!.superpowers/sdd/progress.md
