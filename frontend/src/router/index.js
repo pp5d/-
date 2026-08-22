@@ -13,7 +13,7 @@ const routes = [
       { path: 'tickets', component: () => import('../views/Placeholder.vue') },
       { path: 'manage', component: () => import('../views/knowledge/KnowledgeList.vue'), meta: { roles: ['engineer', 'admin'] } },
       { path: 'manage/edit/:id?', component: () => import('../views/knowledge/KnowledgeEdit.vue'), meta: { roles: ['engineer', 'admin'] } },
-      { path: 'review', component: () => import('../views/Placeholder.vue'), meta: { roles: ['engineer', 'admin'] } },
+      { path: 'review', component: () => import('../views/knowledge/ReviewCenter.vue'), meta: { roles: ['engineer', 'admin'] } },
       { path: 'admin/users', component: () => import('../views/admin/Users.vue'), meta: { roles: ['admin'] } }
     ]
   }
