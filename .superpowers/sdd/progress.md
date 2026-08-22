@@ -132,6 +132,12 @@ Task 2: complete (commits 91e8b6d..5d9a0d0, review clean)
 Task 3: complete (commits dcfacc1..75c9973, review clean)
 Task 4: complete (commits 06e5a60..38afb8f, review clean)
 
+## M5 里程碑：完成
+- final review 2 Critical+3 Important 已修复（5548289：sync_bot 降权/配置变量化/import 限定 public/附件清理/文档）
+- 后端 51 passed；Docker 实际构建待部署环境实测
+- 里程碑总结：docs/superpowers/progress/2026-08-22-m5-总结.md
+
+
 
 
 
