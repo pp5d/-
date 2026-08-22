@@ -1,3 +1,5 @@
+import io
+
 from app.config import settings
 from app.db import SessionLocal
 from app.models.user import User
@@ -55,3 +57,30 @@ def test_edit_published_returns_draft(client):
     r = client.put(f"/api/knowledge/{kid}", json={"body": "改"}, headers=_h(te))
     assert r.status_code == 200
     assert r.json()["status"] == "draft"
+
+
+def test_support_cannot_download_unpublished_attachment(client):
+    _seed("eng1", "engineer")
+    _seed("sup1", "support")
+    te = _token(client, "eng1")
+    ts = _token(client, "sup1")
+    kid = client.post("/api/knowledge", json={"title": "附件测试", "kind": "article", "body": "b"}, headers=_h(te)).json()["id"]
+    # eng1 给草稿上传附件（未发布）
+    files = {"file": ("图.jpg", io.BytesIO(b"\xff\xd8\xff fake"), "image/jpeg")}
+    r = client.post(f"/api/files?knowledge_id={kid}", files=files, headers=_h(te))
+    assert r.status_code == 200
+    aid = r.json()["id"]
+    # support 无法下载未发布知识的附件
+    r2 = client.get(f"/api/files/{aid}/download", headers=_h(ts))
+    assert r2.status_code == 403
+
+
+def test_support_cannot_upload_to_others_knowledge(client):
+    _seed("eng1", "engineer")
+    _seed("sup1", "support")
+    te = _token(client, "eng1")
+    ts = _token(client, "sup1")
+    kid = client.post("/api/knowledge", json={"title": "上传越权", "kind": "article", "body": "b"}, headers=_h(te)).json()["id"]
+    files = {"file": ("图.jpg", io.BytesIO(b"\xff\xd8\xff fake"), "image/jpeg")}
+    r = client.post(f"/api/files?knowledge_id={kid}", files=files, headers=_h(ts))
+    assert r.status_code == 403

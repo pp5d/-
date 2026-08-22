@@ -43,7 +43,8 @@ def upload_file(
     item = db.get(KnowledgeItem, knowledge_id)
     if item is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "知识不存在")
-    if not (user.role in ("engineer", "admin") or item.author_id == user.id):
+    can_edit = (user.role in ("engineer", "admin")) if settings.APP_MODE == "public" else (user.role in ("engineer", "admin") or item.author_id == user.id)
+    if not can_edit:
         raise HTTPException(status.HTTP_403_FORBIDDEN, "无权上传附件")
     kind = _kind_of(file.filename or "")
     if not kind:
