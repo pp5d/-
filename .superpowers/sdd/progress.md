@@ -12,6 +12,11 @@ Task 7: complete (commits af1a574..563d710, review clean after fix)
 Task 8: complete (commits 987e534..6020211, review clean)
 Task 9: complete (commits 5da2b69..29782f9, review clean)
 
+## M1 里程碑：完成
+- final review 完成，3 项必改已修复（commit 286562b，SECRET_KEY 校验/public 挂载隔离/group_name 补全）
+- 后端 15 passed；前端静态编译通过，运行时待普通终端补验
+- 里程碑总结：docs/superpowers/progress/2026-08-22-m1-总结.md
+
 
 
 
@@ -27,6 +32,7 @@ Task 9: complete (commits 5da2b69..29782f9, review clean)
 - Login.vue 无前端表单校验，依赖后端报错（Task 7，设计取舍）
 - Home.vue 死代码，待 M1 收尾清理（Task 8）
 - 新建用户 group_name 被静默丢弃，建议 UserCreate 加 group_name（Task 9，简报层缺口）
+
 
 
 
