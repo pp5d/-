@@ -163,5 +163,7 @@ Task 3: complete (commits 7377302..364fd8e, review clean)
 
 ## M7 验收与交付
 
-（尚未开始）
+Task 1: complete (commits d68d466..6520e78, review clean)
+
+
 
