@@ -56,7 +56,9 @@ def knowledge_usage(db: Session = Depends(get_db)):
 @router.get("/ticket-response")
 def ticket_response(db: Session = Depends(get_db)):
     answered = db.execute(
-        select(Ticket.created_at, Ticket.answered_at).where(Ticket.status == "answered", Ticket.answered_at.isnot(None))
+        select(Ticket.created_at, Ticket.answered_at).where(
+            Ticket.answered_at.isnot(None), Ticket.created_at.isnot(None)
+        )
     ).all()
     durations = [(a - c).total_seconds() for c, a in answered if a and c]
     avg_seconds = (sum(durations) / len(durations)) if durations else 0

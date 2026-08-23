@@ -12,9 +12,9 @@ app.include_router(files.router)
 app.include_router(qa.router)
 app.include_router(tickets.router)
 app.include_router(sync.router)
-app.include_router(stats.router)
 if settings.APP_MODE == "full":
     app.include_router(users.router)
+    app.include_router(stats.router)
 
 _origins = [o.strip() for o in settings.CORS_ORIGINS.split(",") if o.strip()]
 app.add_middleware(
