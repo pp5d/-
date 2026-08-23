@@ -148,6 +148,8 @@ Task 4: complete (commits 06e5a60..38afb8f, review clean)
 
 Task 1: complete (commits ca5b022..06a9a3c, review clean)
 Task 2: complete (commits 056f19d..dbe50ea, review clean)
+Task 3: complete (commits 7377302..364fd8e, review clean)
+
 
 
 
