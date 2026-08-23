@@ -150,6 +150,12 @@ Task 1: complete (commits ca5b022..06a9a3c, review clean)
 Task 2: complete (commits 056f19d..dbe50ea, review clean)
 Task 3: complete (commits 7377302..364fd8e, review clean)
 
+## M6 里程碑：完成
+- final review 2 项已修复（be31779：统计口径含已关闭工单 + stats 路由按模式门控）
+- 后端测试通过；前端运行时待补验
+- 里程碑总结：docs/superpowers/progress/2026-08-22-m6-总结.md
+
+
 
 
 
