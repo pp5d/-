@@ -1,0 +1,11 @@
+# 统一换行符，避免 Windows/Linux 混用导致脚本执行问题
+* text=auto
+*.sh text eol=lf
+*.py text eol=lf
+*.js text eol=lf
+*.vue text eol=lf
+*.md text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+Dockerfile text eol=lf
+*.conf text eol=lf
