@@ -16,7 +16,7 @@ router = APIRouter(prefix="/api/qa", tags=["qa"])
 @router.post("", response_model=QaOut)
 def ask(body: QaIn, user: User = Depends(rate_limit_qa), db: Session = Depends(get_db)):
     try:
-        results = search(body.question, db)
+        results = search(body.question, db, machine=body.machine or None)
     except Exception:
         results = []
     if results and results[0][0] >= SIM_THRESHOLD:
