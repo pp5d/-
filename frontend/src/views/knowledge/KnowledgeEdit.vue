@@ -8,8 +8,16 @@
           <el-option label="故障案例" value="case" /><el-option label="代码表格" value="code" />
         </el-select>
       </el-form-item>
-      <el-form-item label="分类"><el-input v-model="form.category" /></el-form-item>
-      <el-form-item label="适用机型"><el-input v-model="form.machines" placeholder="如 A5/A6，逗号分隔" /></el-form-item>
+      <el-form-item label="分类">
+        <el-select v-model="form.category" filterable allow-create placeholder="选择或输入分类">
+          <el-option v-for="c in categories" :key="c" :label="c" :value="c" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="适用机型">
+        <el-select v-model="machineList" multiple filterable allow-create placeholder="选择或输入机型">
+          <el-option v-for="m in machines" :key="m" :label="m" :value="m" />
+        </el-select>
+      </el-form-item>
 
       <el-form-item v-if="form.kind==='case'" label="故障现象"><el-input v-model="form.case_fields.symptom" /></el-form-item>
       <el-form-item v-if="form.kind==='case'" label="排查步骤"><el-input v-model="form.case_fields.steps" type="textarea" /></el-form-item>
@@ -57,6 +65,9 @@ const router = useRouter()
 const aliasInput = ref('')
 const attachments = ref([])
 const form = reactive({ title: '', kind: 'article', category: '', machines: '', body: '', aliases: [], case_fields: {} })
+const categories = ['说明书', '知识文档', '现场经验', '未命中经验', '故障处理', '维护保养', '运动控制', '温度控制', 'HMI操作']
+const machines = ['A5', 'A6', 'A7', 'B系列', 'C系列']
+const machineList = ref([])
 const rendered = computed(() => md.render(form.body))
 
 function addAlias() {
@@ -74,6 +85,7 @@ async function doUpload(opt) {
 }
 
 async function save() {
+  form.machines = machineList.value.join('/')
   const body = { ...form, case_fields: form.kind === 'case' ? form.case_fields : null }
   if (form.id) {
     await http.put(`/knowledge/${form.id}`, body)
@@ -90,6 +102,7 @@ onMounted(async () => {
     const r = await http.get(`/knowledge/${route.params.id}`)
     Object.assign(form, r)
     form.case_fields = r.case_fields || {}
+    machineList.value = (r.machines || '').split('/').filter(Boolean)
   }
 })
 </script>
