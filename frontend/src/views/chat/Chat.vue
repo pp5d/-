@@ -16,6 +16,11 @@
       </div>
       <div v-if="loading" class="msg assistant"><div class="bubble">思考中…</div></div>
     </div>
+    <div class="machine-row">
+      <el-select v-model="machine" placeholder="按机型过滤（可选）" clearable style="width:200px">
+        <el-option v-for="m in machines" :key="m" :label="m" :value="m" />
+      </el-select>
+    </div>
     <div class="input-row">
       <el-input v-model="question" placeholder="描述你的问题，如：E012 报警怎么处理" @keyup.enter="send" :disabled="loading" />
       <el-button type="primary" @click="send" :loading="loading">发送</el-button>
@@ -34,6 +39,8 @@ const STORAGE_KEY = 'aiqa_chat_history'
 const MAX_MESSAGES = 30
 const DEFAULT_WELCOME = { role: 'assistant', text: '你好！我是注塑机上位机智能助手，请描述你遇到的问题。' }
 
+const machines = ['A5', 'A6', 'A7', 'B系列', 'C系列']
+const machine = ref('')
 const messages = ref([{ ...DEFAULT_WELCOME }])
 const question = ref('')
 const loading = ref(false)
@@ -55,7 +62,7 @@ async function send() {
   question.value = ''
   loading.value = true
   try {
-    const r = await http.post('/qa', { question: q })
+    const r = await http.post('/qa', { question: q, machine: machine.value || '' })
     const msg = { role: 'assistant', text: r.answer, sources: r.sources, hit: r.hit }
     if (r.hit === false && !(r.sources && r.sources.length)) {
       msg.question = q
@@ -76,7 +83,7 @@ async function freeAnswer(i) {
   if (!q || loading.value) return
   loading.value = true
   try {
-    const r = await http.post('/qa', { question: q, allow_free: true })
+    const r = await http.post('/qa', { question: q, allow_free: true, machine: machine.value || '' })
     messages.value.push({ role: 'assistant', text: r.answer, hit: false, sources: [] })
     m.question = ''
   } catch (e) {
@@ -123,5 +130,6 @@ onMounted(() => {
 .msg.user .bubble { background: #d9ecff; }
 .sources { margin-top: 8px; font-size: 12px; color: #666; }
 .miss-actions { margin-top: 8px; display: flex; gap: 8px; }
+.machine-row { margin-top: 12px; }
 .input-row { display: flex; gap: 8px; margin-top: 12px; }
 </style>
