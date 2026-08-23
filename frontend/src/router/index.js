@@ -15,7 +15,8 @@ const routes = [
       { path: 'manage', component: () => import('../views/knowledge/KnowledgeList.vue'), meta: { roles: ['engineer', 'admin'] } },
       { path: 'manage/edit/:id?', component: () => import('../views/knowledge/KnowledgeEdit.vue'), meta: { roles: ['engineer', 'admin'] } },
       { path: 'review', component: () => import('../views/knowledge/ReviewCenter.vue'), meta: { roles: ['engineer', 'admin'] } },
-      { path: 'admin/users', component: () => import('../views/admin/Users.vue'), meta: { roles: ['admin'] } }
+      { path: 'admin/users', component: () => import('../views/admin/Users.vue'), meta: { roles: ['admin'] } },
+      { path: 'admin/stats', component: () => import('../views/admin/Stats.vue'), meta: { roles: ['admin'] } }
     ]
   }
 ]
