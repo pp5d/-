@@ -170,3 +170,8 @@ Task 3: complete (commits b594e12..14f0ecc, README 交付说明)
 
 
 
+
+## 增量：分类与机型检索
+
+（尚未开始）
+
