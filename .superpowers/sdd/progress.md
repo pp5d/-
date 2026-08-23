@@ -174,6 +174,13 @@ Task 3: complete (commits b594e12..14f0ecc, README 交付说明)
 ## 增量：分类与机型检索
 
 Task 1: complete (commits 900f1d2..1fbf209, review clean)
+Task 2: complete (commits e6093ad..5fcae66, 分类下拉+机型多选)
+Task 3: complete (commits 5fcae66..c161d68, 问答机型选择器)
+
+## 增量：完成
+- 分类/机型常量 + 检索软加权 + 工单沉淀自动分类 + 前端下拉/选择器
+- 后端 56 passed
+
 
 
 
