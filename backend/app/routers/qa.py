@@ -27,7 +27,9 @@ def ask(body: QaIn, user: User = Depends(rate_limit_qa), db: Session = Depends(g
         for _, _, item in results:
             if item.id not in seen:
                 seen.add(item.id)
+                item.view_count += 1
                 sources.append(QaSource(id=item.id, title=item.title))
+        db.commit()
         return QaOut(answer=answer, sources=sources, hit=True)
     if body.allow_free:
         return QaOut(answer=generate_free(body.question), sources=[], hit=False)
